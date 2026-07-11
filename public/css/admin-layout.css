@@ -1,0 +1,94 @@
+/* resources/css/admin-layout.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8fafc;
+    overflow-x: hidden;
+}
+
+/* Sidebar Wrapper & Core Geometry */
+.admin-wrapper {
+    display: flex;
+    width: 100vw;
+    align-items: stretch;
+}
+
+#sidebar-admin {
+    min-width: 260px;
+    max-width: 260px;
+    background-color: #0f172a; /* Deep Charcoal Navy */
+    color: #94a3b8;
+    min-height: 100vh;
+    position: fixed;
+    z-index: 99;
+    transition: all 0.3s;
+}
+
+#sidebar-admin .sidebar-header {
+    padding: 24px;
+    background-color: #0b0f19;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+#sidebar-admin .sidebar-brand {
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: #ffffff;
+    text-decoration: none;
+}
+#sidebar-admin .sidebar-brand span { color: #facc15; }
+
+/* Navigation Links */
+.sidebar-menu {
+    padding: 20px 0;
+    list-style: none;
+    margin: 0;
+}
+.sidebar-menu li a {
+    padding: 14px 24px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    transition: all 0.2s;
+    border-left: 4px solid transparent;
+}
+.sidebar-menu li a i {
+    width: 28px;
+    font-size: 1.1rem;
+}
+.sidebar-menu li a:hover, .sidebar-menu li.active a {
+    color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.04);
+    border-left-color: #3b82f6;
+}
+
+/* Page Main Body Offset */
+#main-content-admin {
+    width: 100%;
+    padding-left: 260px; /* Offset setebal lebar sidebar fixed */
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+/* Premium Topbar Component */
+.admin-topbar {
+    background: #ffffff;
+    padding: 15px 30px;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.01);
+}
+.admin-avatar-box {
+    width: 36px;
+    height: 36px;
+    background-color: #facc15;
+    color: #0f172a;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

@@ -1,0 +1,143 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+}
+
+/* Tema Warna Utama */
+:root {
+    --primary-color: #0f172a; /* Navy Gelap */
+    --accent-color: #2563eb;  /* Biru Edukasi */
+    --text-light: #64748b;
+}
+
+/* Kustomisasi Navbar */
+.navbar-brand {
+    font-weight: 700;
+    color: var(--primary-color) !important;
+    letter-spacing: 0.5px;
+}
+
+.nav-link {
+    font-weight: 500;
+    color: #475569 !important;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--accent-color) !important;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    padding: 100px 0;
+    border-bottom-right-radius: 100px;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1.2;
+}
+
+/* Desain Card Kursus */
+.custom-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+    background: white;
+}
+
+.custom-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Tombol Kustom */
+.btn-accent {
+    background-color: var(--accent-color);
+    color: white;
+    font-weight: 500;
+    padding: 10px 25px;
+    border-radius: 8px;
+    border: none;
+    transition: all 0.3s;
+}
+
+.btn-accent:hover {
+    background-color: #1d4ed8;
+    color: white;
+    box-shadow: 0 5px 15px rgba(37, 99, 214, 0.4);
+}
+
+/* Halaman Login/Register */
+.auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to bottom right, #0f172a, #1e3a8a);
+}
+
+.auth-card {
+    border: none;
+    border-radius: 20px;
+    box-sizing: border-box;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+/* Tambahan untuk Informasi Tambahan Halaman Home */
+.bg-gradient-dark {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+
+.icon-box {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(37, 99, 214, 0.1);
+    color: #2563eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.step-card {
+    position: relative;
+    border: none;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+.step-number {
+    position: absolute;
+    top: -20px;
+    left: 30px;
+    width: 40px;
+    height: 40px;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    box-shadow: 0 4px 10px rgba(37, 99, 214, 0.3);
+}
+
+.star-rating {
+    color: #f59e0b; /* Warna Emas */
+}
+
+.trusted-section {
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}

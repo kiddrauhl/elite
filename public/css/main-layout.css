@@ -1,0 +1,70 @@
+/* resources/css/main-layout.css */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --blue-dark: #0f172a;
+    --blue-primary: #1e40af;
+    --blue-light: #3b82f6;
+    --yellow-glow: #facc15;
+    --white-clean: #ffffff;
+    --bg-light: #f8fafc;
+    --bg-pastel-blue: #f0f6ff;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--white-clean);
+    color: var(--blue-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Base Content Push */
+main {
+    flex: 1 0 auto;
+}
+
+/* Global Navbar Styling */
+.navbar-main-theme {
+    background-color: rgba(30, 64, 175, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px 0;
+}
+.navbar-main-theme .navbar-brand {
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--white-clean) !important;
+}
+.navbar-main-theme .navbar-brand span { color: var(--yellow-glow); }
+.navbar-main-theme .nav-link {
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.85) !important;
+    margin: 0 10px;
+    transition: all 0.3s;
+}
+.navbar-main-theme .nav-link:hover, .navbar-main-theme .nav-link.active {
+    color: var(--yellow-glow) !important;
+}
+
+/* User Dropdown */
+.user-dropdown-toggle {
+    color: white !important;
+    font-weight: 600;
+}
+
+/* Pill Button */
+.btn-pill-nav {
+    background-color: var(--yellow-glow);
+    color: var(--blue-dark) !important;
+    font-weight: 600;
+    padding: 8px 24px;
+    border-radius: 50px;
+    border: none;
+    transition: all 0.3s;
+}
+.btn-pill-nav:hover {
+    background-color: #eab308;
+    transform: translateY(-1px);
+}

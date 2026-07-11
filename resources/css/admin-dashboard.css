@@ -1,0 +1,138 @@
+/* public/css/admin-dashboard.css */
+
+:root {
+    --neutral-50: #f8fafc;
+    --neutral-100: #f1f5f9;
+    --neutral-200: #e2e8f0;
+    --neutral-700: #334155;
+    --neutral-900: #0f172a;
+
+    --brand-primary: #2563eb;    /* Royal Blue */
+    --brand-success: #059669;    /* Emerald Green */
+    --brand-warning: #d97706;    /* Amber */
+    --brand-info: #06b6d4;       /* Cyan */
+}
+
+/* Base Wrapper */
+.dashboard-container {
+    background-color: var(--neutral-50);
+    min-height: 100vh;
+    padding: 24px;
+}
+
+/* Welcome Banner Component */
+.welcome-card {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+    border-radius: 16px;
+    padding: 32px;
+    color: #ffffff;
+    box-shadow: 0 10px 25px rgba(37, 99, 214, 0.15);
+    margin-bottom: 30px;
+}
+
+/* Metric Cards (Widgets) */
+.metric-card {
+    background: #ffffff;
+    border: 1px solid var(--neutral-100);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 1px 2px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.04);
+}
+
+.metric-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--neutral-700);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--neutral-900);
+    line-height: 1;
+    margin: 8px 0;
+}
+
+/* Icon Containers */
+.icon-box-premium {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.icon-blue { background: #eff6ff; color: var(--brand-primary); }
+.icon-amber { background: #fffbeb; color: var(--brand-warning); }
+.icon-emerald { background: #f0fdf4; color: var(--brand-success); }
+.icon-cyan { background: #ecfeff; color: var(--brand-info); }
+
+/* Analytics & Data Blocks */
+.content-block {
+    background: #ffffff;
+    border: 1px solid var(--neutral-200);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.block-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--neutral-900);
+    margin-bottom: 0;
+}
+
+/* Professional Table Interface */
+.table-premium {
+    margin-bottom: 0;
+}
+
+.table-premium th {
+    background-color: var(--neutral-50);
+    color: var(--neutral-700);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--neutral-200);
+}
+
+.table-premium td {
+    padding: 16px;
+    vertical-align: middle;
+    color: var(--neutral-700);
+    font-size: 0.9rem;
+    border-bottom: 1px solid var(--neutral-100);
+}
+
+/* Status Badges */
+.status-pill {
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.status-pending { background-color: #fef3c7; color: #b45309; }
+.status-completed { background-color: #d1fae5; color: #065f46; }
+
+/* Utilities */
+.btn-action-sm {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
