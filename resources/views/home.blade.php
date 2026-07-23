@@ -541,13 +541,24 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program</h6>
-                    <p class="text-muted small mb-4">Siswa dapat memperkenalkan diri, menyusun kalimat sederhana (Simple Present Tense), dan memahami instruksi dasar.</p>
-                    <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
-                    <ul class="text-muted small ps-3">
-                        <li>Pertemuan 2x Seminggu</li>
-                        <li>Buku Materi Bahasa Inggris</li>
-                    </ul>
+                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program (Level Beginner)</h6>
+                        <p class="text-muted small mb-4">
+                            Program ini dirancang untuk tingkat pemula. Setelah menyelesaikan level ini, siswa diharapkan mampu memperkenalkan diri secara percaya diri, menyusun kalimat sederhana (Simple Present Tense), dan memahami instruksi dasar berbahasa Inggris.
+                        </p>
+
+                        <h6 class="fw-bold text-dark mb-2">Detail Pelaksanaan</h6>
+                        <ul class="text-muted small ps-3 mb-4">
+                            <li><strong>Durasi Level:</strong> 3 Bulan</li>
+                            <li><strong>Total Pertemuan:</strong> 24 Pertemuan (2x Seminggu)</li>
+                            <li><strong>Jadwal Kelas:</strong> [Pukul 15.00 - 16.30 WITA]</li>
+                        </ul>
+
+                        <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
+                        <ul class="text-muted small ps-3">
+                            <li>Buku Materi Bahasa Inggris</li>
+                            <li>Materi Tiap Pertemuan</li>
+                            <li>Sertifikat Kelulusan</li>
+                        </ul>
                     <div class="price-box w-100 text-center">
                         <span class="d-block text-muted small fw-normal mb-1">Biaya</span>
                         <span class="text-primary">Rp 2.150.000</span> <small class="text-muted fw-normal">/ Level</small>
@@ -565,14 +576,25 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program</h6>
-                    <p class="text-muted small mb-4">Mengembangkan kemampuan komunikasi mandiri melalui penguatan struktur kalimat, peningkatan kemampuan listening, serta pemahaman agar siswa lancar melakukan percakapan dua arah dan mengekspresikan pendapat.</p>
-                    <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
-                    <ul class="text-muted small ps-3">
-                        <li>Pertemuan 3x Seminggu</li>
-                        <li>Buku Materi Bahasa Inggris</li>
-                        <li>Class Movie dan Conversation Class</li>
-                    </ul>
+                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program (Level Intermediate)</h6>
+                        <p class="text-muted small mb-4">
+                            Mengembangkan kemampuan komunikasi mandiri melalui penguatan struktur kalimat dan peningkatan kemampuan <em>listening</em>. Siswa dilatih agar lancar melakukan percakapan dua arah dan mampu mengekspresikan pendapat dengan baik dan terstruktur.
+                        </p>
+
+                        <h6 class="fw-bold text-dark mb-2">Detail Pelaksanaan</h6>
+                        <ul class="text-muted small ps-3 mb-4">
+                            <li><strong>Durasi Level:</strong> 3 Bulan</li>
+                            <li><strong>Total Pertemuan:</strong> 24 Pertemuan (1-2x Seminggu)</li>
+                            <li><strong>Jadwal Kelas:</strong> [Pukul 16.00 - 17.30 WITA]</li>
+                        </ul>
+
+                        <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
+                        <ul class="text-muted small ps-3">
+                            <li>Buku Materi Bahasa Inggris</li>
+                            <li>Class Movie (Pembelajaran via Audio-Visual)</li>
+                            <li>Conversation Class</li>
+                            <li>Sertifikat Level Kelulusan</li>
+                        </ul>
                     <div class="price-box w-100 text-center">
                         <span class="d-block text-muted small fw-normal mb-1">Biaya</span>
                         <span class="text-warning">Rp 2.150.000</span> <small class="text-muted fw-normal">/ Level</small>
@@ -590,14 +612,24 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program</h6>
-                    <p class="text-muted small mb-4">Program yang diselaraskan langsung dengan kurikulum sekolah ini berfokus pada pendalaman grammar, struktur teks fungsional (seperti narrative atau descriptive), dan trik pengerjaan soal ujian guna memastikan siswa meraih nilai akademik yang tinggi dan selalu siap menghadapi ujian sekolah.</p>
-                    <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
-                    <ul class="text-muted small ps-3">
-                        <li>Pertemuan 2x Seminggu</li>
-                        <li>Buku Materi Bahasa Inggris</li>
-                        <li>Class Movie dan Conversation Class</li>
-                    </ul>
+                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program (Level Regular)</h6>
+                        <p class="text-muted small mb-4">
+                            Fokus pada penguatan fondasi tata bahasa (grammar), penambahan kosakata (vocabulary), dan melatih kepercayaan diri siswa. Setelah menyelesaikan level ini, siswa diharapkan mampu merespons percakapan sehari-hari dengan kalimat yang lebih variatif.
+                        </p>
+
+                        <h6 class="fw-bold text-dark mb-2">Detail Pelaksanaan</h6>
+                        <ul class="text-muted small ps-3 mb-4">
+                            <li><strong>Durasi Level:</strong> 3 Bulan</li>
+                            <li><strong>Total Pertemuan:</strong> 24 Pertemuan (2x Seminggu)</li>
+                            <li><strong>Jadwal Kelas:</strong> [Pukul 15.00 - 16.30 WITA]</li>
+                        </ul>
+
+                        <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
+                        <ul class="text-muted small ps-3">
+                            <li>Buku Materi Bahasa Inggris (Modul)</li>
+                            <li>Latihan Praktik Berbicara (Basic Speaking)</li>
+                            <li>Sertifikat Level Kelulusan</li>
+                        </ul>
                     <div class="price-box w-100 text-center">
                         <span class="d-block text-muted small fw-normal mb-1">Biaya</span>
                         <span class="text-success">Rp 2.150.000</span> <small class="text-muted fw-normal">/ Level</small>
@@ -615,15 +647,25 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program</h6>
-                    <p class="text-muted small mb-4">Dirancang untuk mengasah kefasihan tingkat lanjut, level ini melatih siswa berpikir kritis melalui diskusi, dan bedah advanced grammar, yang mempersiapkan mereka untuk berdebat, serta menghadapi pengenalan sertifikasi internasional seperti TOEFL/IELTS.</p>
-                    <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
-                    <ul class="text-muted small ps-3">
-                        <li>Pertemuan Setiap 3x Seminggu</li>
-                        <li>Buku Materi Bahasa Inggris</li>
-                        <li>Class Movie dan Conversation Class</li>
+                    <h6 class="fw-bold text-dark mb-2">Deskripsi Program (Level Expert)</h6>
+                        <p class="text-muted small mb-4">
+                            Dirancang untuk penguasaan bahasa Inggris tingkat lanjut. Berfokus pada kemampuan diskusi kompleks, debat, presentasi, serta pemahaman teks dan audio analitis dengan tingkat akurasi tata bahasa (grammar) dan pelafalan (pronunciation) yang tinggi.
+                        </p>
 
-                    </ul>
+                        <h6 class="fw-bold text-dark mb-2">Detail Pelaksanaan</h6>
+                        <ul class="text-muted small ps-3 mb-4">
+                            <li><strong>Durasi Level:</strong> 3 Bulan</li>
+                            <li><strong>Total Pertemuan:</strong> 24 Pertemuan (2x Seminggu)</li>
+                            <li><strong>Jadwal Kelas:</strong> [Pukul 15.30 - 16.30 WITA]</li>
+                        </ul>
+
+                        <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
+                        <ul class="text-muted small ps-3">
+                            <li>Buku Materi Bahasa Inggris Lanjutan (Advanced)</li>
+                            <li>Presentation Session</li>
+                            <li>Movie Class</li>
+                            <li>Sertifikat Level</li>
+                        </ul>
                     <div class="price-box w-100 text-center">
                         <span class="d-block text-muted small fw-normal mb-1">Biaya</span>
                         <span style="color: #7c3aed; font-weight:800; font-size:1.5rem;">Rp 2.150.000</span> <small class="text-muted fw-normal">/ bulan</small>

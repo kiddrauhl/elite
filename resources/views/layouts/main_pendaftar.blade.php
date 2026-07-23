@@ -39,7 +39,7 @@
 
             <div>
                 <div class="h-16 px-6 flex items-center justify-between border-b border-slate-800/60 bg-[#0f172a]">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 ml-5">
                         <div class="flex flex-col gap-1">
                             <img src="{{ asset('images/elite.png') }}" alt="Elite English Logo" class="h-8 w-auto object-contain">
                         </div>

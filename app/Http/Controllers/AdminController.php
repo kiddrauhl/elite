@@ -3,20 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-//use App\Models\User;
+
 use App\Models\Pendaftar;
-//use App\Models\Siswa;
+
 use App\Models\Kelas;
 use App\Models\Level;
 use App\Models\Pengajar;
-//use App\Models\Gift;
-//use App\Models\JadwalPendaftaran;
-//use App\Models\JadwalBelajar;
-//use App\Models\Pembayaran;
-//use App\Models\Pendaftaran;
-//use App\Models\PenukaranPoint;
-//use App\Models\PointStars;
-//use App\Models\Raport;
+
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
@@ -68,7 +61,6 @@ class AdminController extends Controller
         return view('admin.verifikasi', compact('pendaftar'));
     }
 
-    // Fungsi untuk memperbarui status pendaftar
     public function updateStatus(Request $request, $id)
     {
         $pendaftar = Pendaftar::findOrFail($id);
@@ -93,7 +85,6 @@ class AdminController extends Controller
             });
         }
 
-        // Filter berdasarkan Jenjang / Tingkat Sekolah
         if ($request->filled('jenjang')) {
             $query->where('tingkat_sekolah', $request->jenjang);
         }
@@ -102,19 +93,19 @@ class AdminController extends Controller
             $query->where('id_jadwal_daftar', $request->gelombang);
         }
 
-        // Eksekusi query pendaftar yang sudah difilter
-        $pendaftar = $query->get();
 
-        // 2. Ambil daftar gelombang untuk opsi dropdown di Blade
+        $pendaftar = $query->orderBy('id_pendaftar', 'desc')->get();
+
+
         $listGelombang = DB::table('jadwal_pendaftaran')->orderBy('id_jadwal_daftar', 'desc')->get();
 
-        // 3. WAJIB ADA DI SINI: Ambil daftar pengajar untuk dropdown di Modal Verifikasi
+
         $pengajarList = DB::table('pengajar')
             ->join('users', 'pengajar.id_user', '=', 'users.id')
             ->select('pengajar.id_pengajar', 'users.nama as nama_pengajar')
             ->get();
 
-        // Kembalikan ke view beserta semua variabel yang dibutuhkan
+
         return view('admin.verifikasi', compact('pendaftar', 'pengajarList', 'listGelombang'));
     }
 
@@ -123,7 +114,7 @@ class AdminController extends Controller
     // =======================================================
     public function verifikasiJadwal(Request $request, $id)
     {
-        // 1. Validasi input
+
         $request->validate([
             'tanggal'     => 'required|date',
             'jam_tes'     => 'required',
@@ -131,22 +122,22 @@ class AdminController extends Controller
             'id_pengajar' => 'required',
         ]);
 
-        // 2. Simpan atau Update data jadwal ke tabel pendaftaran
+
         DB::table('pendaftaran')->updateOrInsert(
             ['id_pendaftar' => $id],
             [
                 'tanggal'     => $request->tanggal,
-                'waktu'       => $request->jam_tes,      // Menyimpan jam tes ke kolom waktu
-                'ruangan'     => $request->catatan_tes,  // Menyimpan lokasi/ruangan
+                'waktu'       => $request->jam_tes,
+                'ruangan'     => $request->catatan_tes,
                 'id_pengajar' => $request->id_pengajar,
-                // Metode tes dipaksa menjadi 'offline' sesuai permintaan Anda
+
                 'status'      => 'proses',
                 'created_at'  => now(),
                 'updated_at'  => now(),
             ]
         );
 
-        // 3. Update status di tabel pendaftar
+
         DB::table('pendaftar')
             ->where('id_pendaftar', $id)
             ->update([
@@ -162,8 +153,7 @@ class AdminController extends Controller
     // =======================================================
     public function jadwalIndex()
     {
-        // 🌟 PERBAIKAN: Ubah nama variabel menjadi $jadwal dan gabungkan dengan tabel lain
-        // agar view bisa membaca nama pendaftar dan nama pengajar
+
         $jadwal = DB::table('pendaftaran')
             ->join('pendaftar', 'pendaftaran.id_pendaftar', '=', 'pendaftar.id_pendaftar')
             ->leftJoin('pengajar', 'pendaftaran.id_pengajar', '=', 'pengajar.id_pengajar')
@@ -176,31 +166,30 @@ class AdminController extends Controller
             )
             ->get();
 
-        // Data pengajar untuk dropdown (jika ada fitur edit jadwal di halaman ini)
+
         $pengajarList = DB::table('pengajar')
             ->join('users', 'pengajar.id_user', '=', 'users.id')
             ->select('pengajar.id_pengajar', 'users.nama as nama_pengajar')
             ->get();
 
-        // 🌟 PERBAIKAN: Pastikan 'jadwal' ikut dikirimkan di dalam compact()
+
         return view('admin.jadwal.index', compact('jadwal', 'pengajarList'));
     }
 
     // ==========================================
-    // BAGIAN KHUSUS DATA SISWA (CRUD RIIL)
+    // BAGIAN KHUSUS DATA SISWA
     // ==========================================
 
     // 1. TAMPILKAN DATA (READ)
 
     public function siswaIndex(Request $request)
     {
-        // 1. Ambil data master untuk pilihan opsi Dropdown di Blade
+
         $dataKelas = DB::table('kelas')->get();
         $dataLevel = DB::table('level')->get();
 
         $query = DB::table('siswa')
             ->join('users', 'siswa.id_user', '=', 'users.id')
-            // PERBAIKAN 1: Relasikan pendaftar langsung ke siswa.id_user agar lebih spesifik
             ->join('pendaftar', 'siswa.id_user', '=', 'pendaftar.id_user')
             ->leftJoin('kelas', 'siswa.id_kelas', '=', 'kelas.id_kelas')
             ->leftJoin('level', 'siswa.id_level', '=', 'level.id_level')
@@ -214,7 +203,7 @@ class AdminController extends Controller
                 'kelas.nama_kelas',
                 'level.nama_level'
             )
-            // PERBAIKAN 2 (SOLUSI UTAMA): Mencegah duplikasi data (Cartesian Product)
+
             ->groupBy('siswa.id_siswa');
 
         if ($request->filled('filter_kelas')) {
@@ -222,7 +211,6 @@ class AdminController extends Controller
         }
 
         if ($request->filled('filter_level')) {
-            // PERBAIKAN 3: Filter level sebaiknya menembak langsung ke id_level milik siswa
             $query->where('siswa.id_level', $request->filter_level);
         }
 
@@ -234,41 +222,39 @@ class AdminController extends Controller
     }
 
     /**
-     * 1. PROSES UPDATE DATA SISWA (Multi-Tabel)
+     * 1. PROSES UPDATE DATA SISWA
      */
     public function siswaUpdate(Request $request, $id)
     {
-        // 1. Validasi disesuaikan dengan atribut 'name' di form HTML yang baru
+
         $request->validate([
             'nama_lengkap' => 'required|string|max:255',
             'no_hp'        => 'required|string|max:15',
             'id_level'     => 'required|integer',
-            'id_kelas'     => 'nullable|integer', // Boleh kosong jika siswa dicabut dari kelas
+            'id_kelas'     => 'nullable|integer',
 
         ]);
 
-        // 2. Gunakan Transaction untuk mencegah data corrupt
+
         DB::transaction(function () use ($request, $id) {
 
-            // A. Cari data master siswa berdasarkan id_siswa
+
             $siswa = DB::table('siswa')->where('id_siswa', $id)->first();
 
             if ($siswa) {
-                // B. Update Level Kelas dan Kelas Penempatan di tabel 'siswa'
                 DB::table('siswa')->where('id_siswa', $id)->update([
                     'id_level'   => $request->id_level,
-                    'id_kelas'   => $request->id_kelas, // 🌟 Menyimpan perpindahan kelas
-                    // 'total_point' dihapus dari update agar tidak tertimpa/dimanipulasi
+                    'id_kelas'   => $request->id_kelas,
                     'updated_at' => now(),
                 ]);
 
-                // C. Update Nama Akun di tabel 'users'
+
                 DB::table('users')->where('id', $siswa->id_user)->update([
                     'nama'       => $request->nama_lengkap,
                     'updated_at' => now(),
                 ]);
 
-                // D. Update Nama Lengkap dan Nomor WhatsApp di tabel 'pendaftar'
+
                 DB::table('pendaftar')->where('id_user', $siswa->id_user)->update([
                     'nama_lengkap' => $request->nama_lengkap,
                     'no_hp'        => $request->no_hp,
@@ -303,7 +289,7 @@ class AdminController extends Controller
                 'pendaftar.no_hp',
                 'kelas.nama_kelas'
             )
-            // 🌟 Filter langsung menggunakan nama level, bukan ID angka lagi
+
             ->where('level.nama_level', 'Expert')
             ->orderBy('pendaftar.nama_lengkap', 'asc')
             ->paginate(15);
@@ -313,7 +299,6 @@ class AdminController extends Controller
 
     public function terbitkanSertifikat($id_siswa)
     {
-        // 1. Ambil data siswa dan pendaftar
         $siswa = DB::table('siswa')
             ->join('pendaftar', 'siswa.id_user', '=', 'pendaftar.id_user')
             ->where('siswa.id_siswa', $id_siswa)
@@ -323,25 +308,22 @@ class AdminController extends Controller
             return back()->with('error', 'Data siswa tidak ditemukan.');
         }
 
-        // 2. Tentukan nama file secara otomatis (misal: sertifikat_ahmad_rida.pdf)
         $nama_file = 'sertifikat_' . strtolower(str_replace(' ', '_', $siswa->nama_lengkap)) . '.pdf';
 
-        // 3. Pastikan folder penyimpanannya ada
         $path = public_path('sertifikat');
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
 
-        // 4. Generate PDF dari tampilan Blade (kita akan buat tampilan ini setelah ini)
         $pdf = Pdf::loadView('admin.sertifikat.template', ['siswa' => $siswa]);
 
-        // 5. Atur ukuran kertas menjadi A4 dengan posisi Landscape (mendatar)
+
         $pdf->setPaper('A4', 'landscape');
 
-        // 6. Simpan file PDF ke dalam folder public/sertifikat/
+
         $pdf->save($path . '/' . $nama_file);
 
-        // 7. Update kolom file_sertifikat di database agar sistem tahu sertifikat sudah jadi
+
         DB::table('siswa')
             ->where('id_siswa', $id_siswa)
             ->update(['file_sertifikat' => $nama_file]);
@@ -351,7 +333,6 @@ class AdminController extends Controller
 
     public function penempatanLanjutan()
     {
-        // Ambil data pendaftaran ulang yang sudah lunas (settlement)
         $dataPenempatan = DB::table('pembayaran')
             ->where('pembayaran.order_id', 'like', 'RE-%')
             ->where('pembayaran.status_verifikasi', 'settlement')
@@ -378,7 +359,6 @@ class AdminController extends Controller
 
     public function pilihKelasLanjutan($id_siswa)
     {
-        // 1. Ambil detail siswa beserta info transisi levelnya
         $siswa = DB::table('siswa')
             ->join('pendaftar', 'siswa.id_user', '=', 'pendaftar.id_user')
             ->leftJoin('level as level_lama', 'siswa.id_level', '=', 'level_lama.id_level')
@@ -417,7 +397,7 @@ class AdminController extends Controller
 
         DB::beginTransaction();
         try {
-            // 3. PROSES SAKTI: Naikkan level, kunci kelas baru, dan bersihkan antrean (set NULL)
+
             DB::table('siswa')
                 ->where('id_siswa', $id_siswa)
                 ->update([
@@ -598,28 +578,28 @@ class AdminController extends Controller
     // 1. READ: Tampilkan Halaman Utama Kelas
     public function kelasIndex(Request $request)
     {
-        // 1. Ambil data master untuk pilihan dropdown di Blade
+
         $levels = Level::all();
         $pengajar = Pengajar::all();
-        $dataKelasUtama = Kelas::all(); // Diperlukan untuk mengisi opsi dropdown kelas
+        $dataKelasUtama = Kelas::all();
 
-        // 2. Siapkan kueri utama dengan relasi dan hitung jumlah siswa aktif
+
         $queryKelas = Kelas::with(['level', 'pengajar'])
             ->withCount(['siswa' => function($query) {
                 $query->where('status', 'Aktif');
             }]);
 
-        // 3. Logika Filter Level
+
         if ($request->filled('filter_level')) {
             $queryKelas->where('id_level', $request->filter_level);
         }
 
-        // 4. Logika Filter Kelas (Baru)
+
         if ($request->filled('filter_kelas')) {
             $queryKelas->where('id_kelas', $request->filter_kelas);
         }
 
-        // 5. Eksekusi Kueri, urutkan dari yang terbaru
+
         $kelas = $queryKelas->orderBy('created_at', 'desc')->get();
 
         return view('admin.kelas.index', compact('kelas', 'levels', 'pengajar', 'dataKelasUtama'));
@@ -630,8 +610,8 @@ class AdminController extends Controller
     {
         $request->validate([
             'nama_kelas'  => 'required|string|max:255',
-            'id_level'    => 'required|exists:level,id_level',       // sesuaikan nama tabel level Anda
-            'id_pengajar' => 'required|exists:pengajar,id_pengajar', // sesuaikan nama tabel pengajar Anda
+            'id_level'    => 'required|exists:level,id_level',
+            'id_pengajar' => 'required|exists:pengajar,id_pengajar',
         ]);
 
         Kelas::create([
@@ -681,7 +661,6 @@ class AdminController extends Controller
         return view('admin.pengajar.index', compact('pengajar'));
     }
 
-    // 2. CREATE: Simpan Akun Login di Users dan Biodata di Pengajar (Transaction)
     public function pengajarStore(Request $request)
     {
         $request->validate([
@@ -693,7 +672,7 @@ class AdminController extends Controller
         ]);
 
         DB::transaction(function () use ($request) {
-            // A. Buat data login di tabel users terlebih dahulu
+
             $userId = DB::table('users')->insertGetId([
                 'nama'       => $request->nama_pengajar,
                 'email'      => $request->email,
@@ -704,7 +683,7 @@ class AdminController extends Controller
                 'updated_at' => now(),
             ]);
 
-            // B. Buat data biodata pengajar menggunakan id_user yang baru lahir
+
             DB::table('pengajar')->insert([
                 'id_user'       => $userId,
                 'nama_pengajar' => $request->nama_pengajar,
@@ -726,18 +705,18 @@ class AdminController extends Controller
         ]);
 
         DB::transaction(function () use ($request, $id) {
-            // Ambil data pengajar lama untuk mendapatkan id_user
+
             $pengajar = DB::table('pengajar')->where('id_pengajar', $id)->first();
 
             if ($pengajar) {
-                // A. Update tabel pengajar
+
                 DB::table('pengajar')->where('id_pengajar', $id)->update([
                     'nama_pengajar' => $request->nama_pengajar,
                     'no_hp'         => $request->no_hp,
                     'alamat'        => $request->alamat,
                 ]);
 
-                // B. Update nama akun di tabel users agar sinkron
+
                 DB::table('users')->where('id', $pengajar->id_user)->update([
                     'nama'       => $request->nama_pengajar,
                     'updated_at' => now(),
@@ -755,7 +734,7 @@ class AdminController extends Controller
             $pengajar = DB::table('pengajar')->where('id_pengajar', $id)->first();
 
             if ($pengajar) {
-                // Hapus di kedua tabel sekaligus agar tidak ada data sampah menggantung
+
                 DB::table('pengajar')->where('id_pengajar', $id)->delete();
                 DB::table('users')->where('id', $pengajar->id_user)->delete();
             }
@@ -764,11 +743,11 @@ class AdminController extends Controller
         return redirect()->route('admin.pengajar.index')->with('success', 'Data pengajar dan akun login resmi dihapus dari sistem.');
     }
 
-    // --- Bagian Gift (Hadiah) ---
+
     // -----------------------------------------------------------
-    // A. SUB-MENU 1: LOGIKA CRUD DATA HADIAH (GIFT)
+    // A. CRUD DATA HADIAH (GIFT)
     // -----------------------------------------------------------
-    // 1. CREATE: Simpan Item Hadiah & Unggah File Foto
+    // 1. CREATE
 
     public function giftIndex()
     {
@@ -787,7 +766,7 @@ class AdminController extends Controller
 
         $namaFileFoto = null;
 
-        // Proses pengemasan file gambar ke folder public
+
         if ($request->hasFile('foto_gift')) {
             $file = $request->file('foto_gift');
             $namaFileFoto = 'gift_' . time() . '.' . $file->getClientOriginalExtension();
@@ -807,7 +786,7 @@ class AdminController extends Controller
         return redirect()->route('admin.gift.index')->with('success', 'Katalog hadiah baru berhasil ditambahkan beserta foto!');
     }
 
-    // 2. UPDATE: Perbarui Data & Ganti Foto (Hapus Berkas Foto Lama)
+
     public function giftUpdate(Request $request, $id)
     {
         $request->validate([
@@ -819,15 +798,15 @@ class AdminController extends Controller
         ]);
 
         $giftLama = DB::table('gift')->where('id_gift', $id)->first();
-        $namaFileFoto = $giftLama->foto_gift; // Default gunakan file lama jika tidak ganti foto
+        $namaFileFoto = $giftLama->foto_gift;
 
         if ($request->hasFile('foto_gift')) {
-            // A. Jika ada foto baru, hapus berkas fisik foto lama di folder proyek (jika ada)
+
             if ($giftLama->foto_gift && file_exists(public_path('uploads/gifts/' . $giftLama->foto_gift))) {
                 unlink(public_path('uploads/gifts/' . $giftLama->foto_gift));
             }
 
-            // B. Simpan berkas foto baru
+
             $file = $request->file('foto_gift');
             $namaFileFoto = 'gift_' . time() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/gifts'), $namaFileFoto);
@@ -851,7 +830,7 @@ class AdminController extends Controller
         $gift = DB::table('gift')->where('id_gift', $id)->first();
 
         if ($gift) {
-            // Hapus file gambar di harddisk agar tidak memenuhi storage folder
+
             if ($gift->foto_gift && file_exists(public_path('uploads/gifts/' . $gift->foto_gift))) {
                 unlink(public_path('uploads/gifts/' . $gift->foto_gift));
             }
@@ -865,10 +844,10 @@ class AdminController extends Controller
     // -----------------------------------------------------------
     // B. SUB-MENU 2: LOGIKA VERIFIKASI PENGAJUKAN TUKAR POIN
     // -----------------------------------------------------------
-        // TAMPILKAN DAFTAR ANTRIAN PENGAJUAN
+
     public function pengajuanGiftIndex()
     {
-        // 🌟 PERBAIKAN 1: Gunakan leftJoin agar data tidak gaib jika ada relasi yang putus
+
         $pengajuan = DB::table('penukaran_point')
                         ->leftJoin('siswa', 'penukaran_point.id_siswa', '=', 'siswa.id_siswa')
                         ->leftJoin('users', 'siswa.id_user', '=', 'users.id')
@@ -882,7 +861,6 @@ class AdminController extends Controller
                             'pendaftar.nama_lengkap',
                             'siswa.total_point',
                             'gift.nama_gift',
-                            // 🌟 PERHATIAN: Pastikan ini sama dengan kolom di database Anda!
                             'gift.poin_dibutuhkan',
                             'gift.stok'
                         )
@@ -891,18 +869,16 @@ class AdminController extends Controller
 
     }
 
-    // PROSES SETUJUI (ACC) PENGAJUAN
+    // PROSES SETUJUI PENGAJUAN
     public function pengajuanGiftSetujui($id)
     {
         $data = DB::table('penukaran_point')->where('id_penukaran', $id)->first();
         $gift = DB::table('gift')->where('id_gift', $data->id_gift)->first();
         $siswa = DB::table('siswa')->where('id_siswa', $data->id_siswa)->first();
 
-        // Tetap lakukan validasi: Pastikan poin siswa masih cukup sebelum disetujui
+
         if ($siswa->total_point >= $gift->poin_dibutuhkan) {
 
-            // 🌟 Cukup jalankan UPDATE status.
-            // Setelah kode ini dieksekusi, MySQL Trigger otomatis memotong Poin & Stok!
             DB::table('penukaran_point')->where('id_penukaran', $id)->update([
                 'status'     => 'selesai',
                 'updated_at' => now()
@@ -911,7 +887,7 @@ class AdminController extends Controller
             return redirect()->route('admin.pengajuan_gift.index')->with('success', 'Penukaran poin berhasil disetujui! Poin dan stok otomatis terpotong oleh sistem.');
         }
 
-        // Jika poin ternyata kurang (misal siswa melakukan double-click/spam request)
+
         return redirect()->route('admin.pengajuan_gift.index')->with('error', 'Gagal disetujui! Poin siswa tidak mencukupi.');
     }
 
@@ -928,7 +904,7 @@ class AdminController extends Controller
 
     public function riwayatGiftIndex()
     {
-        // Ambil data penukaran yang statusnya sudah diproses (Disetujui / Ditolak)
+
         $riwayat = DB::table('penukaran_point')
                         ->leftJoin('siswa', 'penukaran_point.id_siswa', '=', 'siswa.id_siswa')
                         ->leftJoin('users', 'siswa.id_user', '=', 'users.id')
@@ -944,7 +920,7 @@ class AdminController extends Controller
                             'gift.nama_gift',
                             'gift.poin_dibutuhkan'
                         )
-                        ->orderBy('penukaran_point.updated_at', 'desc') // Urutkan yang terbaru diproses
+                        ->orderBy('penukaran_point.updated_at', 'desc')
                         ->get();
 
         return view('admin.gift.riwayat', compact('riwayat'));
@@ -957,10 +933,9 @@ class AdminController extends Controller
     public function gelombangIndex()
     {
         $jadwal = DB::table('jadwal_pendaftaran')
-            // 🌟 1. Prioritaskan status 'Buka' ke paling atas
+
             ->orderByRaw("CASE WHEN status = 'Buka' THEN 1 ELSE 2 END")
 
-            // 🌟 2. Jika statusnya sama, urutkan dari ID terbaru ke terlama
             ->orderBy('id_jadwal_daftar', 'desc')
 
             ->get();
@@ -998,7 +973,6 @@ class AdminController extends Controller
             'status'          => 'required|in:buka,tutup',
         ]);
 
-        // Jika status diubah ke Aktif, matikan status gelombang yang lain
         if ($request->status == 'Aktif') {
             DB::table('jadwal_pendaftaran')->where('id_jadwal_daftar', '!=', $id)->update(['status' => 'Nonaktif']);
         }
@@ -1024,22 +998,19 @@ class AdminController extends Controller
     // HALAMAN PENEMPATAN KELAS & LEVEL SISWA BARU
     // =======================================================
 
-    // 1. Tampilkan List Pendaftar yang Siap Ditempatkan Kelas (Termasuk History)
     public function penempatanIndex()
     {
-        // Ambil pendaftar yang SUDAH mengisi Level Rekomendasi/Nilai dari Pengajar
         $siapTempatkan = DB::table('pendaftaran')
             ->join('pendaftar', 'pendaftaran.id_pendaftar', '=', 'pendaftar.id_pendaftar')
             ->leftJoin('pengajar', 'pendaftaran.id_pengajar', '=', 'pengajar.id_pengajar')
             ->leftJoin('users', 'pengajar.id_user', '=', 'users.id')
-            ->leftJoin('level', 'pendaftaran.id_level_rekomendasi', '=', 'level.id_level') // Rekomendasi dari guru
+            ->leftJoin('level', 'pendaftaran.id_level_rekomendasi', '=', 'level.id_level')
 
-            // 🌟 PERBAIKAN 1: Hubungkan ke tabel siswa dan kelas untuk mendeteksi status penempatan final
+
             ->leftJoin('siswa', 'pendaftar.id_user', '=', 'siswa.id_user')
             ->leftJoin('kelas', 'siswa.id_kelas', '=', 'kelas.id_kelas')
 
-            // ->where('pendaftar.status', 'proses') 🌟 BARIS INI DIHAPUS AGAR HISTORY TETAP MUNCUL
-            ->whereNotNull('pendaftaran.id_level_rekomendasi') // Hanya yang sudah diperiksa pengajar
+            ->whereNotNull('pendaftaran.id_level_rekomendasi')
 
             ->select(
                 'pendaftaran.*',
@@ -1052,12 +1023,11 @@ class AdminController extends Controller
                 'siswa.id_siswa',
                 'kelas.nama_kelas'
             )
-            // 🌟 PERBAIKAN 2: Urutkan agar yang statusnya masih 'proses' (belum dapat kelas) berada di paling atas
+
             ->orderByRaw("FIELD(pendaftar.status, 'proses') DESC")
             ->orderBy('pendaftaran.updated_at', 'desc')
             ->paginate(10);
 
-        // Ambil data Master Kelas dan Master Level untuk Dropdown Pilihan Admin
         $kelasList = DB::table('kelas')->get();
         $levelList = DB::table('level')->get();
 
@@ -1072,14 +1042,13 @@ class AdminController extends Controller
             'id_kelas' => 'required',
         ]);
 
-        // Ambil data pendaftar untuk mendapatkan 'id_user'-nya
         $pendaftar = DB::table('pendaftar')->where('id_pendaftar', $id_pendaftar)->first();
 
         if (!$pendaftar) {
             return redirect()->back()->with('error', 'Data pendaftar tidak ditemukan.');
         }
 
-        // 🌟 KUNCI PENGAMAN: Pastikan status pembayaran sudah 'settlement' (lunas) di tabel pembayaran
+
         $pembayaran = DB::table('pembayaran')
             ->where('id_pendaftar', $id_pendaftar)
             ->where('status_verifikasi', 'settlement')
@@ -1091,13 +1060,13 @@ class AdminController extends Controller
 
         DB::beginTransaction();
         try {
-            // A. UPDATE status pendaftar menjadi 'diterima' sesuai ENUM database
+
             DB::table('pendaftar')->where('id_pendaftar', $id_pendaftar)->update([
                 'status'   => 'diterima',
                 'id_level' => $request->id_level
             ]);
 
-            // B. INSERT data baru ke tabel 'siswa'
+
             $id_siswa = DB::table('siswa')->insertGetId([
                 'id_user'         => $pendaftar->id_user,
                 'id_level'        => $request->id_level,
@@ -1108,7 +1077,7 @@ class AdminController extends Controller
                 'total_point'     => 0
             ]);
 
-            // Bagian C dan D telah dihapus karena sudah diotomatisasi oleh Trigger di phpMyAdmin
+
 
             DB::commit();
 
@@ -1177,7 +1146,7 @@ class AdminController extends Controller
         return view('admin.jadwalbelajar.index', compact('jadwalList', 'kelasList', 'pengajarList', 'levelList'));
     }
 
-    // 🌟 2. TAMBAHKAN FUNGSI TAMPILKAN HALAMAN EDIT
+    // FUNGSI TAMPILKAN HALAMAN EDIT
     public function jadwalEdit($id)
     {
         $jadwal = DB::table('jadwal_belajar')->where('id_jadwal', $id)->first();
@@ -1191,7 +1160,7 @@ class AdminController extends Controller
         return view('admin.jadwalbelajar.edit', compact('jadwal', 'kelasList', 'pengajarList', 'levelList'));
     }
 
-    // 🌟 3. TAMBAHKAN FUNGSI PROSES UPDATE DATA
+    // FUNGSI PROSES UPDATE DATA
     public function jadwalBelajarUpdate(\Illuminate\Http\Request $request, $id)
     {
         $request->validate([
@@ -1258,11 +1227,11 @@ class AdminController extends Controller
 
     public function laporanPerkembangan(\Illuminate\Http\Request $request)
     {
-        // 1. Ambil Input Filter (Mendukung 'id_*' atau 'filter_*' dari Blade)
+
         $selectedLevel = $request->input('id_level') ?? $request->input('filter_level');
         $selectedKelas = $request->input('id_kelas') ?? $request->input('filter_kelas');
 
-        // 2. Metadata untuk Dropdown Filter
+
         $levels = DB::table('level')->get();
 
         $kelasQuery = DB::table('kelas');
@@ -1271,7 +1240,7 @@ class AdminController extends Controller
         }
         $kelasList = $kelasQuery->get();
 
-        // 3. Query Top 3 Point Stars dengan Filter
+
         $topStarsQuery = DB::table('siswa')
             ->join('pendaftar', 'siswa.id_user', '=', 'pendaftar.id_user')
             ->join('users', 'siswa.id_user', '=', 'users.id')
@@ -1287,7 +1256,7 @@ class AdminController extends Controller
         }
         $topStars = $topStarsQuery->orderBy('siswa.total_point', 'desc')->limit(5)->get();
 
-        // 4. Query Kehadiran Siswa dengan Filter
+
         $kehadiranSiswaQuery = DB::table('absensi')
             ->join('siswa', 'absensi.id_siswa', '=', 'siswa.id_siswa')
             ->join('pendaftar', 'siswa.id_user', '=', 'pendaftar.id_user')
@@ -1307,7 +1276,7 @@ class AdminController extends Controller
         }
         $kehadiranSiswa = $kehadiranSiswaQuery->groupBy('absensi.id_siswa', 'pendaftar.nama_lengkap', 'kelas.nama_kelas')->get();
 
-        // 5. Query Kehadiran Pengajar dengan Filter
+
         $kehadiranPengajarQuery = DB::table('absensi')
             ->join('kelas', 'absensi.id_kelas', '=', 'kelas.id_kelas')
             ->join('pengajar', 'kelas.id_pengajar', '=', 'pengajar.id_pengajar')
@@ -1325,7 +1294,7 @@ class AdminController extends Controller
         }
         $kehadiranPengajar = $kehadiranPengajarQuery->groupBy('pengajar.id_pengajar', 'pengajar.nama_pengajar', 'kelas.id_kelas', 'kelas.nama_kelas')->get();
 
-        // 6. Query Top 3 Nilai Akhir dari Tabel Raport dengan Filter
+
         $topNilaiQuery = DB::table('raport')
             ->join('siswa', 'raport.id_siswa', '=', 'siswa.id_siswa')
             ->join('pendaftar', 'siswa.id_user', '=', 'pendaftar.id_user')
@@ -1341,7 +1310,6 @@ class AdminController extends Controller
         }
         $topNilai = $topNilaiQuery->orderBy('raport.rata_rata', 'desc')->limit(5)->get();
 
-        // 7. 🌟 PERBAIKAN UTAMA: Query Data Grafik Dinamis Mengikuti Filter
         $chartQuery = DB::table('kelas')
             ->leftJoin('siswa', 'kelas.id_kelas', '=', 'siswa.id_kelas')
             ->leftJoin('raport', 'siswa.id_siswa', '=', 'raport.id_siswa')
@@ -1369,10 +1337,10 @@ class AdminController extends Controller
 
     public function profil()
     {
-        // Mengambil data langsung dari tabel users
+
         $profil = DB::table('users')->where('id', Auth::id())->first();
 
-        // Ganti menjadi 'admin.profil' jika ini di dalam AdminController
+
         return view('admin.profil.index', compact('profil'));
     }
 
@@ -1392,7 +1360,7 @@ class AdminController extends Controller
             'updated_at' => now()
         ];
 
-        // Logika Upload Foto
+
         if ($request->hasFile('foto_profil')) {
             $userLama = DB::table('users')->where('id', $userId)->first();
 

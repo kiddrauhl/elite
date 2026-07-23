@@ -43,6 +43,8 @@ Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showRese
 // 4. Memproses penyimpanan password baru ke database
 Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
+Route::get('/verifikasi-otp', [AuthController::class, 'halamanOtp'])->name('otp.verifikasi');
+Route::post('/verifikasi-otp', [AuthController::class, 'prosesOtp'])->name('otp.proses');
 
 // Rute untuk halaman verifikasi pendaftar baru
 Route::get('/admin/verifikasi', function () {
@@ -149,9 +151,17 @@ Route::middleware(['auth', 'role:pendaftar'])->prefix('pendaftar')->group(functi
 
     // Halaman Dashboard Pendaftar: /pendaftar/dashboard
     Route::get('/dashboard', [PendaftarController::class, 'dashboard']);
+    // Halaman form isi biodata berdasarkan gelombang yang dipilih
+    // UBAH BARIS INI:
+    Route::get('/isi-biodata/{id_jadwal}', [PendaftarController::class, 'halamanBiodata'])->name('pendaftar.isi_biodata');
+    // Pastikan ada /{id_jadwal} di bagian ini
+    //Route::get('/biodata/{id_jadwal}', [PendaftarController::class, 'halamanBiodata'])->name('pendaftar.biodata');
+
+    // Proses simpan pendaftaran ke database
+    Route::post('/simpan-biodata', [PendaftarController::class, 'simpanBiodata'])->name('pendaftar.simpan_biodata');
 
     // Rute Tambahan Pendaftar
-    Route::get('/biodata', [PendaftarController::class, 'biodata'])->name('pendaftar.biodata');
+    //Route::get('/biodata', [PendaftarController::class, 'biodata'])->name('pendaftar.biodata');
     Route::post('/biodata/update', [PendaftarController::class, 'updateBiodata'])->name('pendaftar.biodata.update');
     Route::post('/password/update', [PendaftarController::class, 'updatePassword'])->name('pendaftar.password.update');
 

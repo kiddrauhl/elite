@@ -35,11 +35,11 @@ class PaymentCallbackController extends Controller
             $statusVerifikasi = 'pending';
 
             if ($transactionStatus == 'settlement' || $transactionStatus == 'capture') {
-                $statusVerifikasi = 'settlement'; // Lunas
+                $statusVerifikasi = 'settlement';
             } elseif ($transactionStatus == 'pending') {
                 $statusVerifikasi = 'pending';
             } elseif (in_array($transactionStatus, ['deny', 'expire', 'cancel'])) {
-                $statusVerifikasi = 'failed'; // Gagal
+                $statusVerifikasi = 'cancel';
             }
 
             // 5. Update status di tabel pembayaran terlebih dahulu
@@ -50,40 +50,37 @@ class PaymentCallbackController extends Controller
                     'updated_at' => now()
                 ]);
 
-            // 6. LOGIKA PEMILAHAN ROLE (Pendaftar vs Siswa)
-            // Kita cek berdasarkan awalan string Order ID
+            // 6. LOGIKA PEMILAHAN (Pendaftar vs Siswa)
+
             if ($statusVerifikasi == 'settlement') {
 
                 if (Str::startsWith($orderId, 'RE-')) {
-                    // ---- KONDISI A: JIKA SISWA (REGISTRASI ULANG) ----
-                    // Ambil id_siswa dari baris pembayaran atau parsing dari Order ID
-                    // Lalu jalankan query untuk memperbarui level atau status aktifnya
 
                     $pembayaranData = DB::table('pembayaran')->where('order_id', $orderId)->first();
 
-                    // Contoh logika: Mengubah id_level siswa menjadi id_level_lanjutan karena sudah bayar
+
                     $siswaData = DB::table('siswa')->where('id_pendaftar', $pembayaranData->id_pendaftar)->first();
 
                     if ($siswaData && $siswaData->id_level_lanjutan) {
                         DB::table('siswa')
                             ->where('id_siswa', $siswaData->id_siswa)
                             ->update([
-                                'id_level' => $siswaData->id_level_lanjutan, // Levelnya naik
-                                // 'id_level_lanjutan' => null // Kosongkan kembali jika sistem Anda menganut alur ini
+                                'id_level' => $siswaData->id_level_lanjutan,
+
                             ]);
 
-                        // 🌟 OPSIONAL: Tambahkan logika pemberian poin stars di sini jika pembayaran registrasi ulang juga menghasilkan poin!
+
                     }
 
                 } else {
                     // ---- KONDISI B: JIKA PENDAFTAR BARU ----
-                    // Jalankan query untuk mengubah status pendaftar baru menjadi lunas / siap test level
+
                     $pembayaranData = DB::table('pembayaran')->where('order_id', $orderId)->first();
 
                     DB::table('pendaftar')
                         ->where('id_pendaftar', $pembayaranData->id_pendaftar)
                         ->update([
-                            'status_pendaftaran' => 'Lunas Placement Test' // Sesuaikan dengan nama status di sistem Anda
+                            'status_pendaftaran' => 'Lunas Placement Test'
                         ]);
                 }
             }

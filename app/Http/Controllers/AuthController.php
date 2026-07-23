@@ -8,57 +8,45 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB; // Pastikan DB dipanggil untuk insert tabel pendaftar
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
-    // Proses Registrasi Pendaftar Baru
+
     public function register(Request $request)
     {
-        // 1. Validasi Input (Primary key disesuaikan ke id_jadwal_daftar)
+        // 1. Validasi HANYA untuk pembuatan Akun (User)
         $request->validate([
-            'nama'            => 'required|string|max:255',
-            'email'           => 'required|string|email|max:255|unique:users',
-            'password'        => 'required|string|min:8|confirmed',
-            'jenis_kelamin'   => 'required|in:L,P',
-            'no_hp'           => 'required|string|max:15',
-            'asal_sekolah'    => 'required|string|max:255',
-            'tingkat_sekolah' => 'required|in:SD,SMP,SMA,Kuliah',
-            'alamat'          => 'required|string',
-            'jadwal_daftar'   => 'required|exists:jadwal_pendaftaran,id_jadwal_daftar', // Poin koreksi key
-        ], [
-            'jadwal_daftar.required' => 'Silakan pilih gelombang pendaftaran yang tersedia.',
-            'jadwal_daftar.exists'   => 'Gelombang pendaftaran yang dipilih tidak valid atau sudah ditutup.'
+            'nama'     => 'required|string|max:255',
+            'email'    => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         return DB::transaction(function () use ($request) {
+            
+            // 2. Generate OTP
+            $otpCode = rand(100000, 999999);
 
-            // 2. Simpan ke Tabel Users
+            // 3. HANYA Simpan ke Tabel Users
             $user = User::create([
                 'nama'     => $request->nama,
                 'email'    => $request->email,
                 'password' => Hash::make($request->password),
-                'role'     => 'pendaftar',
+                'role'     => 'pendaftar', // Role tetap pendaftar untuk akses dashboard
                 'status'   => 'aktif',
+                'otp'      => $otpCode,
             ]);
 
-            // 3. Simpan ke Tabel Pendaftar
-            Pendaftar::create([
-                'id_user'         => $user->id,
-                'nama_lengkap'    => $user->nama,
-                'jenis_kelamin'   => $request->jenis_kelamin,
-                'no_hp'           => $request->no_hp,
-                'asal_sekolah'    => $request->asal_sekolah,
-                'tingkat_sekolah' => $request->tingkat_sekolah,
-                'alamat'          => $request->alamat,
-                'id_jadwal_daftar' => $request->jadwal_daftar, // ID gelombang yang dipilih siswa
-                'tanggal_daftar'  => now(),
-                'status'          => 'Menunggu Jadwal'
-            ]);
+            // ❌ Pendaftar::create(...) DIHAPUS TOTAL DARI SINI ❌
 
-            Auth::login($user);
+            // 4. Kirim Email OTP
+            \Illuminate\Support\Facades\Mail::send('emails.otp', ['otpCode' => $otpCode], function($message) use($request){
+                $message->to($request->email);
+                $message->subject('Verifikasi Akun - Kode OTP');
+            });
 
-            return redirect('/pendaftar/dashboard')->with('success', 'Akun berhasil dibuat! Selamat datang di Elite English.');
+            session(['verifikasi_email' => $request->email]);
+            return redirect('/verifikasi-otp')->with('success', 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.');
         });
     }
 
@@ -76,61 +64,92 @@ class AuthController extends Controller
         return view('auth.register', compact('gelombangForm'));
     }
 
-    // Proses Login
-    public function login(Request $request) // Sesuaikan dengan nama fungsi Anda
+    public function halamanOtp()
     {
-        // 1. Validasi input form
+        
+        if (!session('verifikasi_email')) {
+            return redirect('/register');
+        }
+        return view('auth.otp');
+    }
+
+    public function prosesOtp(Request $request)
+    {
+        $email = session('verifikasi_email');
+        $user = User::where('email', $email)->first();
+
+        // Validasi apakah OTP cocok
+        if ($user && $user->otp == $request->otp) {
+            // Hapus OTP agar tidak bisa dipakai ulang
+            $user->update(['otp' => null]);
+
+            // Hapus session sementara
+            session()->forget('verifikasi_email');
+
+            // LAKUKAN LOGIN DI SINI
+            Auth::login($user);
+
+            return redirect('/pendaftar/dashboard')->with('success', 'Email berhasil diverifikasi! Selamat datang di Elite English.');
+        }
+
+        // Jika OTP salah
+        return back()->with('error', 'Kode OTP salah. Silakan coba lagi.');
+    }
+
+    // Proses Login
+    public function login(Request $request)
+    {
+
         $request->validate([
             'email' => 'required|email',
             'password' => 'required'
         ]);
 
-        // 2. Cari apakah email tersebut ada di database
+
         $user = User::where('email', $request->email)->first();
 
-        // 3. Jika Email TIDAK DITEMUKAN
+
         if (!$user) {
             return back()->withErrors([
                 'email' => 'Alamat email ini belum terdaftar di sistem.',
             ])->withInput($request->only('email', 'remember'));
         }
 
-        // 4. Jika Email ada, cek kecocokan PASSWORD
+
         if (!Hash::check($request->password, $user->password)) {
             return back()->withErrors([
                 'password' => 'Password yang Anda masukkan salah.',
             ])->withInput($request->only('email', 'remember'));
         }
 
-        // 5. Jika Email dan Password BENAR, eksekusi login
+
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->filled('remember'))) {
 
             $request->session()->regenerate();
 
-            // Cek role user yang login, lalu arahkan ke dashboard masing-masing
-            $userRole = Auth::user()->role; // Sesuaikan 'role' dengan nama kolom di database Anda
+            $userRole = Auth::user()->role;
 
             if ($userRole == 'admin') {
-                return redirect()->intended('/admin/dashboard'); // Ganti dengan URL Admin Anda
+                return redirect()->intended('/admin/dashboard');
             } elseif ($userRole == 'pengajar') {
-                return redirect()->intended('/pengajar/dashboard'); // Ganti dengan URL Pengajar Anda
+                return redirect()->intended('/pengajar/dashboard');
             } elseif ($userRole == 'pendaftar') {
-                return redirect()->intended('/pendaftar/dashboard'); // Ganti dengan URL Pengajar Anda
+                return redirect()->intended('/pendaftar/dashboard');
             } elseif ($userRole == 'siswa') {
-                return redirect()->intended('/siswa/dashboard'); // Ganti dengan URL Siswa Anda
+                return redirect()->intended('/siswa/dashboard');
             }
 
-            // Fallback jika role tidak terdaftar
+
             return redirect('/');
         }
 
-        // Fallback jika terjadi error sistem yang tidak terduga
+
         return back()->withErrors([
             'email' => 'Terjadi kesalahan saat mencoba masuk.',
         ]);
     }
 
-    // Proses Keluar (Logout)
+
     public function logout(Request $request)
     {
         Auth::logout();

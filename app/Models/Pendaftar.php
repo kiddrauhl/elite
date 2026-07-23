@@ -23,8 +23,10 @@ class Pendaftar extends Model
         'asal_sekolah',
         'tingkat_sekolah',
         'alamat',
+        
         'id_level',
         'tanggal_daftar',
+        
         'id_jadwal_daftar',
         'status'
     ];

@@ -17,8 +17,11 @@ class PendaftarController extends Controller
         $userId = Auth::id();
         $pendaftar = DB::table('pendaftar')->where('id_user', $userId)->first();
 
+        // 1. PASTIKAN BARIS INI ADA UNTUK MENGAMBIL DATA
+        $gelombang = DB::table('jadwal_pendaftaran')->get(); 
+
         $pendaftaran = null;
-        $siswaData = null; // 🌟 Untuk menampung info kelas final dari admin
+        $siswaData = null; 
 
         if ($pendaftar) {
             $pendaftaran = DB::table('pendaftaran')
@@ -29,7 +32,6 @@ class PendaftarController extends Controller
                 ->select('pendaftaran.*', 'users.nama as nama_pengajar', 'level.nama_level')
                 ->first();
 
-            // 🌟 JIKA ADMIN SUDAH MENENTUKAN KELAS (status diterima), ambil info kelas & levelnya
             if ($pendaftar->status == 'diterima') {
                 $siswaData = DB::table('siswa')
                     ->join('kelas', 'siswa.id_kelas', '=', 'kelas.id_kelas')
@@ -40,11 +42,56 @@ class PendaftarController extends Controller
             }
         }
 
-        return view('pendaftar.dashboard', compact('pendaftar', 'pendaftaran', 'siswaData'));
+        // 2. PASTIKAN KATA 'gelombang' TERTULIS DI DALAM COMPACT
+        return view('pendaftar.dashboard', compact('pendaftar', 'pendaftaran', 'siswaData', 'gelombang'));
     }
 
+    public function halamanBiodata($id_jadwal)
+    {
+        // 1. Ambil data dari tabel berdasarkan $id_jadwal
+        $gelombang = DB::table('jadwal_pendaftaran')->where('id_jadwal_daftar', $id_jadwal)->first();
+        
+        // 2. Jika tidak ketemu, kembalikan ke dashboard
+        if (!$gelombang) {
+            return redirect('/pendaftar/dashboard')->with('error', 'Gelombang tidak ditemukan.');
+        }
 
-    // 🌟 FUNGSI BARU: Eksekusi perubahan Role dari Pendaftar menjadi Siswa setelah Bayar Full
+        // 3. PASTIKAN BARIS INI BENAR (Mengirim $gelombang ke view)
+        return view('pendaftar.biodata', compact('gelombang'));
+    }
+
+    public function simpanBiodata(Request $request)
+    {
+        // Validasi form biodata
+        $request->validate([
+            'id_jadwal_daftar' => 'required',
+            'jenis_kelamin'    => 'required|in:L,P',
+            'no_hp'            => 'required|string|max:15',
+            'asal_sekolah'     => 'required|string|max:255',
+            'tingkat_sekolah'  => 'required|in:SD,SMP,SMA,Kuliah',
+            'alamat'           => 'required|string',
+        ]);
+
+        $user = Auth::user();
+
+        // 🌟 DI SINILAH PENDAFTARAN SEBENARNYA TERJADI 🌟
+        // Data dimasukkan ke tabel pendaftar dengan status 'pending'
+        DB::table('pendaftar')->insert([
+            'id_user'          => $user->id,
+            'nama_lengkap'     => $user->nama ?? $user->name, 
+            'jenis_kelamin'    => $request->jenis_kelamin,
+            'no_hp'            => $request->no_hp,
+            'asal_sekolah'     => $request->asal_sekolah,
+            'tingkat_sekolah'  => $request->tingkat_sekolah,
+            'alamat'           => $request->alamat,
+            'id_jadwal_daftar' => $request->id_jadwal_daftar,
+            'tanggal_daftar'   => now(),
+            'status'           => 'Menunggu Jadwal' // Ini akan otomatis mengubah tampilan dashboard menjadi "Menunggu Verifikasi"
+        ]);
+
+        return redirect('/pendaftar/dashboard')->with('success', 'Pendaftaran berhasil! Silakan tunggu Admin mengatur jadwal Level Test Anda.');
+    }
+
     public function prosesPelunasan()
     {
         $userId = Auth::id();
@@ -54,9 +101,9 @@ class PendaftarController extends Controller
             'status' => 'aktif'
         ]);
 
-        // 2. UBAH ROLE USER MENJADI SISWA (Pintu dashboard siswa resmi terbuka!)
+        // 2. UBAH ROLE USER MENJADI SISWA
         DB::table('users')->where('id', $userId)->update([
-            'role' => 'siswa' // Sesuaikan jika string di db Anda 'Siswa' atau angka
+            'role' => 'siswa'
         ]);
 
         return redirect('/siswa/dashboard')->with('success', 'Pembayaran Berhasil! Selamat datang di kelas bimbingan SIBIJAR.');
@@ -154,13 +201,12 @@ class PendaftarController extends Controller
         // 2. JIKA LEVEL SUDAH DITENTUKAN PENGAJAR -> Cek Tagihan
         if ($pendaftar->id_level) {
 
-            // 🌟 PERBAIKAN: Ambil tagihan TERBARU tanpa peduli statusnya
             $pembayaran = DB::table('pembayaran')
                 ->where('id_pendaftar', $pendaftar->id_pendaftar)
                 ->orderBy('created_at', 'desc')
                 ->first();
 
-            // Skenario A: Jika belum ada tagihan sama sekali, BUAT BARU
+            // Skenario A: Jika belum ada tagihan sama sekali
             if (!$pembayaran) {
                 \Midtrans\Config::$serverKey = env('MIDTRANS_SERVER_KEY');
                 \Midtrans\Config::$isProduction = env('MIDTRANS_IS_PRODUCTION', false);
@@ -213,7 +259,7 @@ class PendaftarController extends Controller
         // 1. Ambil data pembayaran berdasarkan Order ID
         $pembayaran = DB::table('pembayaran')
             ->where('order_id', $orderId)
-            ->where('status_verifikasi', 'settlement') // Pastikan hanya bisa dicetak jika lunas
+            ->where('status_verifikasi', 'settlement')
             ->first();
 
         if (!$pembayaran) {
@@ -234,7 +280,6 @@ class PendaftarController extends Controller
 
         $pdf = Pdf::loadView('pendaftar.invoice', $data);
 
-        // Gunakan stream() agar PDF terbuka di tab browser baru (bisa di-print/di-download dari sana)
         return $pdf->stream('Invoice-' . $orderId . '.pdf');
     }
 }

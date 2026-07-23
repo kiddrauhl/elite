@@ -21,7 +21,8 @@ class User extends Authenticatable
         'nama',      // Mengganti 'name' menjadi 'nama' sesuai database
         'email',
         'password',
-        'role',      // Wajib ditambahkan agar AuthController bisa menyimpan role
+        'role',  
+        'otp',    // Wajib ditambahkan agar AuthController bisa menyimpan role
         'status',    // Wajib ditambahkan
         'profile_photo',
     ];
