@@ -187,20 +187,56 @@
                 </p>
             </div>
 
+            <!-- BAGIAN TANDA TANGAN (Diperbarui dengan QR Code) -->
+            <!-- BAGIAN TANDA TANGAN -->
+            @php
+                $tanggalTerbit = \Carbon\Carbon::parse($raport->tanggal_dibagikan)->translatedFormat('d F Y');
+
+                // Menyesuaikan dengan nama di gambar Anda
+                $namaDirektur = "AMELIA HANDAYANI, S.PD.";
+
+                // 1. Teks untuk QR Code DOS
+                $teksKepala = "Ditandatangani secara elektronik oleh: " . $namaDirektur . " selaku Director of Studies (DOS) Elite English Course. Dokumen Raport diterbitkan pada: " . $tanggalTerbit;
+
+                // 2. Teks untuk QR Code Instruktur Pembimbing
+                $namaInstruktur = $raport->nama_pengajar ?? 'SARAH AULIA S.PD.';
+                $teksInstruktur = "Ditandatangani secara elektronik oleh: " . $namaInstruktur . " selaku Instruktur Pembimbing Elite English Course pada " . $tanggalTerbit;
+            @endphp
+
             <div class="flex justify-between text-[13px] text-slate-900 mt-8">
-                <div class="text-center w-64">
-                    <p class="mb-1 text-transparent">.</p>
-                    <p class="mb-1 text-transparent">.</p>
-                    <p class="font-bold mb-20">Mengetahui,<br>Kepala Akademik</p>
-                    <p class="font-bold uppercase underline underline-offset-4">( ........................................ )</p>
-                    <p class="text-[11px] mt-1 text-slate-500">Elite English Course</p>
+                <!-- Kolom Kiri: DOS -->
+                <div class="text-center w-72 flex flex-col justify-between">
+                    <!-- Area Teks Atas (Tinggi disamakan jadi 96px / h-24) -->
+                    <div class="h-24 flex flex-col justify-end items-center pb-4">
+                        <p class="font-bold">Mengetahui,<br>Director of Studies (DOS)</p>
+                    </div>
+
+                    <!-- Area QR dan Nama -->
+                    <div class="flex flex-col items-center">
+                        <img src="data:image/svg+xml;base64, {!! base64_encode(QrCode::format('svg')->size(75)->margin(0)->generate($teksKepala)) !!}" alt="QR DOS" class="w-[75px] h-[75px] mb-4">
+
+                        <p class="font-bold uppercase underline underline-offset-4">{{ $namaDirektur }}</p>
+                        <p class="text-[11px] mt-1 text-slate-500">Elite English Course</p>
+                    </div>
                 </div>
 
-                <div class="text-center w-64">
-                    <p class="mb-1">Diterbitkan di Kota Banjarmasin,</p>
-                    <p class="mb-1">Tanggal: <span class="font-bold">{{ date('d F Y', strtotime($raport->tanggal_dibagikan)) }}</span></p>
-                    <p class="font-bold mb-20">Instruktur Pembimbing,</p>
-                    <p class="font-bold uppercase underline underline-offset-4">{{ $raport->nama_pengajar }}</p>
+                <!-- Kolom Kanan: Instruktur -->
+                <div class="text-center w-72 flex flex-col justify-between">
+                    <!-- Area Teks Atas (Tinggi disamakan jadi 96px / h-24) -->
+                    <div class="h-24 flex flex-col justify-end items-center pb-4">
+                        <p class="mb-1">Diterbitkan di Kota Banjarmasin,</p>
+                        <p class="mb-1">Tanggal: <span class="font-bold">{{ $tanggalTerbit }}</span></p>
+                        <p class="font-bold">Instruktur Pengajar,</p>
+                    </div>
+
+                    <!-- Area QR dan Nama -->
+                    <div class="flex flex-col items-center">
+                        <img src="data:image/svg+xml;base64, {!! base64_encode(QrCode::format('svg')->size(75)->margin(0)->generate($teksInstruktur)) !!}" alt="QR Instruktur" class="w-[75px] h-[75px] mb-4">
+
+                        <p class="font-bold uppercase underline underline-offset-4">{{ $namaInstruktur }}</p>
+                        <!-- Spacer Gaib: Agar tinggi struktur bawah sama persis dengan yang kiri -->
+                        <p class="text-[11px] mt-1 text-transparent select-none">.</p>
+                    </div>
                 </div>
             </div>
 

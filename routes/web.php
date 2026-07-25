@@ -9,6 +9,7 @@ use App\Http\Controllers\SiswaController;
 use App\Http\Controllers\PengajarController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\SertifikatController;
 use App\Http\Controllers\HomeController;
 
 
@@ -144,6 +145,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/alumni', [App\Http\Controllers\AdminController::class, 'dataAlumni']);
     Route::get('/alumni/terbitkan/{id_siswa}', [AdminController::class, 'terbitkanSertifikat']);
 
+    Route::post('/admin/siswa/{id_siswa}/terbitkan-sertifikat', [AdminController::class, 'terbitkanSertifikat'])->name('admin.terbitkan_sertifikat');
+
     });
 
 // ROUTE KHUSUS PENDAFTAR (Dilindungi Middleware)
@@ -161,7 +164,7 @@ Route::middleware(['auth', 'role:pendaftar'])->prefix('pendaftar')->group(functi
     Route::post('/simpan-biodata', [PendaftarController::class, 'simpanBiodata'])->name('pendaftar.simpan_biodata');
 
     // Rute Tambahan Pendaftar
-    //Route::get('/biodata', [PendaftarController::class, 'biodata'])->name('pendaftar.biodata');
+    Route::get('/biodata', [PendaftarController::class, 'biodata'])->name('pendaftar.biodata');
     Route::post('/biodata/update', [PendaftarController::class, 'updateBiodata'])->name('pendaftar.biodata.update');
     Route::post('/password/update', [PendaftarController::class, 'updatePassword'])->name('pendaftar.password.update');
 
@@ -253,5 +256,8 @@ Route::prefix('pengajar')->middleware(['auth'])->group(function () {
 
     Route::get('/profil', [PengajarController::class, 'profil'])->name('pengajar.profil');
     Route::post('/profil/update', [PengajarController::class, 'updateProfil'])->name('pengajar.profil.update');
-    });
+});
+
+// Rute Publik Validasi QR Code Sertifikat
+Route::get('/validasi-sertifikat/{id_siswa}/{id_level}', [App\Http\Controllers\SertifikatController::class, 'verifikasiPublic'])->name('validasi.sertifikat');
 

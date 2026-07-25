@@ -49,7 +49,7 @@ class SiswaController extends Controller
         }
 
         // 3. Ambil riwayat penukaran hadiah terakhir milik siswa ini (Maksimal 5 history terbaru)
-        $penukaran = collect(); // Default koleksi kosong jika siswa tidak ditemukan
+        $penukaran = collect();
 
         if ($siswa) {
             $penukaran = DB::table('penukaran_point')
@@ -64,16 +64,24 @@ class SiswaController extends Controller
         $jadwalTerdekat = null;
 
         if ($siswa && $siswa->id_kelas) {
-            // 🌟 AMBIL JADWAL TERDEKAT UNTUK KELAS SISWA INI
+
             $jadwalTerdekat = DB::table('jadwal_belajar')
                 ->where('id_kelas', $siswa->id_kelas)
-                ->where('tanggal', '>=', now()->toDateString()) // Ambil jadwal hari ini atau ke depan
-                ->orderBy('tanggal', 'asc') // Urutkan dari tanggal paling dekat
+                ->where('tanggal', '>=', now()->toDateString())
+                ->orderBy('tanggal', 'asc')
                 ->orderBy('jam_mulai', 'asc')
                 ->first();
         }
+
+        $leaderboardGlobal = DB::table('siswa')
+            ->join('users', 'siswa.id_user', '=', 'users.id')
+            ->leftJoin('kelas', 'siswa.id_kelas', '=', 'kelas.id_kelas')
+            ->select('users.nama as nama_siswa', 'kelas.nama_kelas', 'siswa.total_point')
+            ->orderBy('siswa.total_point', 'desc')
+            ->limit(5)
+            ->get();
         // 4. Lemparkan semua data ke view Dashboard Siswa
-        return view('siswa.dashboard', compact('siswa', 'penukaran', 'jadwalTerdekat', 'navbarProfil'));
+        return view('siswa.dashboard', compact('siswa', 'penukaran', 'jadwalTerdekat', 'navbarProfil', 'leaderboardGlobal'));
     }
 
     // =======================================================

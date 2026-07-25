@@ -18,10 +18,10 @@ class PendaftarController extends Controller
         $pendaftar = DB::table('pendaftar')->where('id_user', $userId)->first();
 
         // 1. PASTIKAN BARIS INI ADA UNTUK MENGAMBIL DATA
-        $gelombang = DB::table('jadwal_pendaftaran')->get(); 
+        $gelombang = DB::table('jadwal_pendaftaran')->get();
 
         $pendaftaran = null;
-        $siswaData = null; 
+        $siswaData = null;
 
         if ($pendaftar) {
             $pendaftaran = DB::table('pendaftaran')
@@ -50,7 +50,7 @@ class PendaftarController extends Controller
     {
         // 1. Ambil data dari tabel berdasarkan $id_jadwal
         $gelombang = DB::table('jadwal_pendaftaran')->where('id_jadwal_daftar', $id_jadwal)->first();
-        
+
         // 2. Jika tidak ketemu, kembalikan ke dashboard
         if (!$gelombang) {
             return redirect('/pendaftar/dashboard')->with('error', 'Gelombang tidak ditemukan.');
@@ -78,7 +78,7 @@ class PendaftarController extends Controller
         // Data dimasukkan ke tabel pendaftar dengan status 'pending'
         DB::table('pendaftar')->insert([
             'id_user'          => $user->id,
-            'nama_lengkap'     => $user->nama ?? $user->name, 
+            'nama_lengkap'     => $user->nama ?? $user->name,
             'jenis_kelamin'    => $request->jenis_kelamin,
             'no_hp'            => $request->no_hp,
             'asal_sekolah'     => $request->asal_sekolah,
@@ -116,7 +116,10 @@ class PendaftarController extends Controller
         $pendaftar = DB::table('pendaftar')->where('id_user', $userId)->first();
         $user = DB::table('users')->where('id', $userId)->first();
 
-        return view('pendaftar.biodata', compact('pendaftar', 'user'));
+        // Jika Anda hanya ingin mengambil 1 gelombang yang sedang aktif, gunakan kode ini:
+        $gelombang = DB::table('jadwal_pendaftaran')->where('status', 'buka')->first();
+
+        return view('pendaftar.biodata', compact('pendaftar', 'user', 'gelombang'));
     }
     public function editBiodata()
     {

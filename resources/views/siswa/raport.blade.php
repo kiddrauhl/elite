@@ -76,11 +76,19 @@
 
 </div>
 
+
 <!-- 🌟 TAMBAHAN: Script Logika Chart.js -->
 @if(count($raportList) > 0)
+
+<!-- 1. Elemen Input Hidden untuk menyimpan data PHP dengan aman -->
+<input type="hidden" id="raportData" value="{{ json_encode($raportList) }}">
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const dataRaport = json($raportList);
+
+        // 2. PERBAIKAN: Ambil data dari elemen hidden menggunakan JavaScript murni
+        const rawData = document.getElementById('raportData').value;
+        const dataRaport = JSON.parse(rawData);
 
         // Membalik urutan array agar grafik dibaca dari kelas pertama (terlama) ke terbaru
         const chartData = [...dataRaport].reverse();

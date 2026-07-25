@@ -287,10 +287,11 @@ class AdminController extends Controller
                 'pendaftar.nama_lengkap',
                 'users.email',
                 'pendaftar.no_hp',
-                'kelas.nama_kelas'
+                'kelas.nama_kelas',
+                'level.nama_level' // Tambahkan ini agar nama level bisa ditampilkan di tabel Admin
             )
-
-            ->where('level.nama_level', 'Expert')
+            // UBAH: Hapus filter 'Expert', ganti dengan memastikan siswa sudah punya level
+            ->whereNotNull('siswa.id_level')
             ->orderBy('pendaftar.nama_lengkap', 'asc')
             ->paginate(15);
 
@@ -299,8 +300,10 @@ class AdminController extends Controller
 
     public function terbitkanSertifikat($id_siswa)
     {
+        // 1. Tambahkan leftJoin ke tabel 'level' untuk mengambil data nama levelnya
         $siswa = DB::table('siswa')
             ->join('pendaftar', 'siswa.id_user', '=', 'pendaftar.id_user')
+            ->leftJoin('level', 'siswa.id_level', '=', 'level.id_level')
             ->where('siswa.id_siswa', $id_siswa)
             ->first();
 
@@ -308,27 +311,38 @@ class AdminController extends Controller
             return back()->with('error', 'Data siswa tidak ditemukan.');
         }
 
-        $nama_file = 'sertifikat_' . strtolower(str_replace(' ', '_', $siswa->nama_lengkap)) . '.pdf';
+        if (is_null($siswa->id_level)) {
+            return back()->with('error', 'Siswa belum memiliki level yang diselesaikan.');
+        }
+
+        // 2. Buat nama file dinamis berdasarkan level
+        $nama_file = 'sertifikat_level_' . $siswa->id_level . '_' . strtolower(str_replace(' ', '_', $siswa->nama_lengkap)) . '.pdf';
 
         $path = public_path('sertifikat');
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
 
-        $pdf = Pdf::loadView('admin.sertifikat.template', ['siswa' => $siswa]);
+        // 3. Buat URL Verifikasi
+        $urlVerifikasi = url('/validasi-sertifikat/' . $siswa->id_siswa . '/' . $siswa->id_level);
 
+        // 4. Load PDF HANYA SEKALI dengan menyertakan kedua variabel
+        $pdf = Pdf::loadView('admin.sertifikat.template', [
+            'siswa' => $siswa,
+            'urlVerifikasi' => $urlVerifikasi
+        ]);
 
         $pdf->setPaper('A4', 'landscape');
-
-
         $pdf->save($path . '/' . $nama_file);
 
+        // 5. Tentukan kolom mana yang akan di-update secara dinamis (sertifikat_level_1, dst.)
+        $kolom_sertifikat = 'sertifikat_level_' . $siswa->id_level;
 
         DB::table('siswa')
             ->where('id_siswa', $id_siswa)
-            ->update(['file_sertifikat' => $nama_file]);
+            ->update([$kolom_sertifikat => $nama_file]);
 
-        return back()->with('success', 'Sertifikat berhasil diterbitkan!');
+        return back()->with('success', 'Sertifikat ' . $siswa->nama_level . ' berhasil diterbitkan!');
     }
 
     public function penempatanLanjutan()

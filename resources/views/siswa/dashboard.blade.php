@@ -3,6 +3,7 @@
 @section('content')
 <div class="p-6 space-y-8 max-w-7xl mx-auto">
 
+    <!-- BANNER UTAMA -->
     <div class="bg-gradient-to-r from-blue-900 via-indigo-900 to-blue-950 text-white p-8 rounded-3xl shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
         <div class="space-y-2 z-10">
             <h1 class="text-3xl font-extrabold tracking-tight">Selamat Datang Kembali, {{ Auth::user()->nama ?? 'Siswa Elite' }}!</h1>
@@ -20,6 +21,82 @@
         <div class="absolute -right-10 -top-10 w-40 h-40 bg-yellow-400/10 rounded-full blur-2xl"></div>
     </div>
 
+    <!-- KOMPONEN GLOBAL LEADERBOARD POINT STARS (Dipindah ke sini) -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+
+        <div class="bg-gradient-to-r from-blue-950 to-blue-900 p-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-yellow-400/20 text-yellow-400 rounded-xl flex items-center justify-center text-lg">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold tracking-wide">Peringkat Tertinggi Satu Gedung</h3>
+                    <p class="text-blue-200 text-xs">Top 5 Point Stars Tertinggi</p>
+                </div>
+            </div>
+            <span class="px-3 py-1 bg-white/10 text-white text-[10px] font-bold uppercase rounded-lg border border-white/20">
+                Satu Gedung
+            </span>
+        </div>
+
+        <div class="p-4 space-y-3">
+            @foreach($leaderboardGlobal as $index => $juara)
+                @php
+                    $rank = $index + 1;
+                    $medalColor = 'bg-slate-100 text-slate-500 border-slate-200';
+                    $medalIcon = $rank;
+
+                    if ($rank == 1) {
+                        $medalColor = 'bg-yellow-100 text-yellow-600 border-yellow-300 shadow-sm shadow-yellow-200';
+                        $medalIcon = '<i class="fa-solid fa-medal"></i>';
+                    } elseif ($rank == 2) {
+                        $medalColor = 'bg-slate-200 text-slate-600 border-slate-300';
+                        $medalIcon = '<i class="fa-solid fa-medal"></i>';
+                    } elseif ($rank == 3) {
+                        $medalColor = 'bg-amber-100 text-amber-700 border-amber-300';
+                        $medalIcon = '<i class="fa-solid fa-medal"></i>';
+                    }
+
+                    $isMe = ($juara->nama_siswa == Auth::user()->name) || ($juara->nama_siswa == Auth::user()->nama);
+                @endphp
+
+                <div class="flex items-center justify-between p-3 rounded-2xl transition-all {{ $isMe ? 'bg-blue-50 border border-blue-200 shadow-sm' : 'hover:bg-slate-50 border border-transparent' }}">
+
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center font-black border-2 {!! $medalColor !!}">
+                            {!! $medalIcon !!}
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold {{ $isMe ? 'text-blue-700' : 'text-slate-800' }}">
+                                {{ $juara->nama_siswa }}
+                                @if($isMe) <span class="ml-1 text-[10px] bg-blue-600 text-white px-2 py-0.5 rounded-md">Kamu</span> @endif
+                            </h4>
+                            <p class="text-xs text-slate-500 font-medium">
+                                <i class="fa-solid fa-door-open w-3"></i> Kelas: {{ $juara->nama_kelas ?? '-' }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="text-right flex flex-col items-end">
+                        <div class="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-lg border border-yellow-200/50">
+                            <span class="text-sm font-black text-slate-800">{{ number_format($juara->point_stars ?? 0, 0, ',', '.') }}</span>
+                            <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
+                        </div>
+                    </div>
+
+                </div>
+            @endforeach
+
+            @if(count($leaderboardGlobal) == 0)
+                <div class="text-center py-6 text-slate-400 text-sm">
+                    <i class="fa-regular fa-face-frown-open text-3xl mb-2 text-slate-300"></i><br>
+                    Belum ada data poin siswa.
+                </div>
+            @endif
+        </div>
+    </div>
+
+    <!-- KARTU STATISTIK -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between group hover:border-amber-300 transition-all">
@@ -64,7 +141,6 @@
             <div class="space-y-1">
                 <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status Pembayaran</p>
                 <div class="pt-1">
-                    {{-- Kondisi penentu status tagihan pembayaran --}}
                     @if(($siswa->status_bayar ?? 'Lunas') == 'Lunas')
                         <span class="inline-flex items-center px-3 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                             <i class="fa-solid fa-shield-check mr-1"></i> Lunas Aktif
@@ -86,6 +162,7 @@
 
     </div>
 
+    <!-- GRID BAWAH: INFORMASI KELAS & RIWAYAT POIN -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 space-y-4">
@@ -114,6 +191,7 @@
                 <p class="text-xs text-slate-400">Hubungi administrasi jika kamu sudah menyelesaikan semua administrasi.</p>
             </div>
             @endif
+
             @if($jadwalTerdekat)
                 <div class="mt-5 flex items-start gap-4 bg-blue-50/60 p-4 rounded-xl border border-blue-100">
                     <div class="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
@@ -135,7 +213,7 @@
                         @endif
                     </div>
                 </div>
-            @else
+            @elseif(isset($siswa->id_kelas))
                 <div class="mt-5 flex items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100 border-dashed">
                     <div class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center shrink-0">
                         <i class="fa-solid fa-mug-hot"></i>
@@ -182,5 +260,6 @@
         </div>
 
     </div>
+
 </div>
 @endsection
