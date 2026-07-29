@@ -79,7 +79,7 @@
 
                     <div class="text-right flex flex-col items-end">
                         <div class="flex items-center gap-1.5 bg-yellow-50 px-3 py-1.5 rounded-lg border border-yellow-200/50">
-                            <span class="text-sm font-black text-slate-800">{{ number_format($juara->point_stars ?? 0, 0, ',', '.') }}</span>
+                            <span class="text-sm font-black text-slate-800">{{ number_format($juara->total_point ?? 0, 0, ',', '.') }}</span>
                             <i class="fa-solid fa-star text-yellow-400 text-xs"></i>
                         </div>
                     </div>

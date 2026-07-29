@@ -293,9 +293,19 @@
                                         </div>
                                     </div>
 
-                                    <a href="/register" class="btn w-100 fw-bold" style="background-color: #f8fafc; color: #3b82f6; border: 1px solid #bfdbfe; border-radius: 0.75rem; padding: 0.75rem; transition: all 0.2s;">
-                                        Pilih Gelombang Ini
-                                    </a>
+                                    @auth
+
+                                        <a href="/pendaftar/dashboard" class="btn w-100 fw-bold" style="background-color: #f8fafc; color: #3b82f6; border: 1px solid #bfdbfe; border-radius: 0.75rem; padding: 0.75rem; transition: all 0.2s;">
+                                            Pilih Gelombang Ini
+                                        </a>
+                                    @endauth
+
+                                    @guest
+
+                                        <a href="/register" class="btn w-100 fw-bold" style="background-color: #f8fafc; color: #3b82f6; border: 1px solid #bfdbfe; border-radius: 0.75rem; padding: 0.75rem; transition: all 0.2s;">
+                                            Pilih Gelombang Ini
+                                        </a>
+                                    @endguest
                                 </div>
                             </div>
                         </div>
@@ -550,7 +560,7 @@
                         <ul class="text-muted small ps-3 mb-4">
                             <li><strong>Durasi Level:</strong> 3 Bulan</li>
                             <li><strong>Total Pertemuan:</strong> 24 Pertemuan (2x Seminggu)</li>
-                            <li><strong>Jadwal Kelas:</strong> [Pukul 15.00 - 16.30 WITA]</li>
+                            <li><strong>Jadwal Kelas:</strong> Pukul 15.00 - 16.30 WITA</li>
                         </ul>
 
                         <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
@@ -585,7 +595,7 @@
                         <ul class="text-muted small ps-3 mb-4">
                             <li><strong>Durasi Level:</strong> 3 Bulan</li>
                             <li><strong>Total Pertemuan:</strong> 24 Pertemuan (1-2x Seminggu)</li>
-                            <li><strong>Jadwal Kelas:</strong> [Pukul 16.00 - 17.30 WITA]</li>
+                            <li><strong>Jadwal Kelas:</strong> Pukul 16.00 - 17.30 WITA</li>
                         </ul>
 
                         <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
@@ -621,7 +631,7 @@
                         <ul class="text-muted small ps-3 mb-4">
                             <li><strong>Durasi Level:</strong> 3 Bulan</li>
                             <li><strong>Total Pertemuan:</strong> 24 Pertemuan (2x Seminggu)</li>
-                            <li><strong>Jadwal Kelas:</strong> [Pukul 15.00 - 16.30 WITA]</li>
+                            <li><strong>Jadwal Kelas:</strong> Pukul 15.00 - 16.30 WITA</li>
                         </ul>
 
                         <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>
@@ -656,7 +666,7 @@
                         <ul class="text-muted small ps-3 mb-4">
                             <li><strong>Durasi Level:</strong> 3 Bulan</li>
                             <li><strong>Total Pertemuan:</strong> 24 Pertemuan (2x Seminggu)</li>
-                            <li><strong>Jadwal Kelas:</strong> [Pukul 15.30 - 16.30 WITA]</li>
+                            <li><strong>Jadwal Kelas:</strong> Pukul 15.30 - 16.30 WITA </li>
                         </ul>
 
                         <h6 class="fw-bold text-dark mb-2">Fasilitas</h6>

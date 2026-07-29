@@ -318,7 +318,7 @@ class AdminController extends Controller
         // 2. Buat nama file dinamis berdasarkan level
         $nama_file = 'sertifikat_level_' . $siswa->id_level . '_' . strtolower(str_replace(' ', '_', $siswa->nama_lengkap)) . '.pdf';
 
-        $path = public_path('sertifikat');
+        $path = '/home/eliteeng/public_html/sertifikat';
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }

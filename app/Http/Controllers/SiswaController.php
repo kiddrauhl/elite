@@ -226,7 +226,7 @@ class SiswaController extends Controller
 
         // 🌟 UBAH DI SINI: Cek dan panggil file_materi
         if ($materi && $materi->file_materi) {
-            $path = 'public/materi/' . $materi->file_materi;
+            $path = '/home/eliteeng/public_html/storage/materi/' . $materi->file_materi;
 
             if (Storage::exists($path)) {
                 return Storage::download($path);

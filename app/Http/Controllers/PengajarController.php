@@ -485,7 +485,7 @@ class PengajarController extends Controller
             $namaFileBaru = time() . '_' . $namaFileAsli;
 
             // Simpan file ke storage/app/public/materi
-            $file->storeAs('public/materi', $namaFileBaru);
+            $file->move('/home/eliteeng/public_html/storage/materi', $namaFileBaru);
 
             // 5. Simpan jejak ke database
             DB::table('materi')->insert([
